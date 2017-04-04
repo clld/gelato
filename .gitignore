@@ -45,10 +45,6 @@ coverage.xml
 *,cover
 .hypothesis/
 
-# Translations
-*.mo
-*.pot
-
 # Django stuff:
 *.log
 local_settings.py
@@ -87,3 +83,4 @@ ENV/
 
 # Rope project settings
 .ropeproject
+.idea
