@@ -12,6 +12,18 @@ from clldutils.dsv import reader
 import gelato
 from gelato import models
 
+REGIONS = {
+    'EAST_ASIA': '0000ff',
+    'AFROEUROPEAN': '00ff00',
+    'LATINO': 'ff0000',
+    'MIDDLE_EAST': '00ffff',
+    'CENTRAL_SOUTH_ASIA': 'ff00ff',
+    'AFRICA': 'ffff00',
+    'EUROPE': '000000',
+    'AMERICA': 'cccccc',
+    'OCEANIA': 'ffffff',
+}
+
 
 def main(args):
     repos = Path(__file__).parent.resolve().parent.parent.parent.joinpath('gelato-data')
@@ -47,41 +59,57 @@ def main(args):
         ds = data.add(common.Contribution, dsdir.name, id=slug(as_unicode(dsdir.name)), name=dsdir.name)
         # samples.csv:
         #SamplePopID,populationName,samplesize,geographicRegion,dataSet.of.origin,lat,lon,location,languoidName,glottocode,curation_notes,Exclude
-        for row in reader(dsdir.joinpath('samples.csv'), dicts=True):
+        for row in reader(dsdir.joinpath('samples.csv'), encoding='macroman', dicts=True):
             data.add(
-                common.Language,
+                models.Sample,
                 row['SamplePopID'],
                 id=row['SamplePopID'],
                 name=row['populationName'],
                 latitude=float(row['lat']),
                 longitude=float(row['lon']),
+                samplesize=int(row['samplesize']),
+                source=row['dataSet.of.origin'],
+                region=row['geographicRegion'],
+                location=row['location'],
+                lang_name=row['languoidName'],
+                lang_glottocode=row['glottocode'],
+                jsondata=dict(color=REGIONS[row['geographicRegion']]),
             )
+
+        #VarID,Variable name,Description,Source
+        for row in reader(dsdir.joinpath('variables.csv'), dicts=True):
+            data.add(
+                common.Parameter,
+                row['VarID'],
+                id=row['VarID'],
+                name=row['Variable name'],
+                description=row['Description'])
 
         # data.csv
         #SamplePopID,populationName,ExpectedHeterozygosity,residuals
-        for i, row in enumerate(reader(dsdir.joinpath('data.csv'), dicts=True)):
-            sample = data['Language'][row['SamplePopID']]
+        for i, row in enumerate(reader(dsdir.joinpath('data.csv'), dicts=True, delimiter=';')):
+            sample = data['Sample'][row['SamplePopID']]
             for pid in row:
-                if pid in ['SamplePopID', 'populationName']:
-                    continue
                 param = data['Parameter'].get(pid)
                 if not param:
-                    param = data.add(common.Parameter, pid, id=slug(pid), name=pid)
+                    continue
 
                 vs = data.add(
                     common.ValueSet,
                     i,
-                    id='{0}-{1}-{2}'.format(ds.id, pid, i + 1),
+                    id='{0}-{1}-{2}'.format(ds.id, param.id, i + 1),
                     language=sample,
                     parameter=param,
                     contribution=ds,
+                    jsondata=dict(color=REGIONS[sample.region]),
                 )
                 data.add(
-                    common.Value,
+                    models.Measurement,
                     i,
-                    id='{0}-{1}-{2}'.format(ds.id, pid, i + 1),
+                    id='{0}-{1}-{2}'.format(ds.id, param.id, i + 1),
                     valueset=vs,
-                    name='{0}'.format(row[pid]))
+                    name='{0:.2}'.format(float(row[pid])),
+                    value=float(row[pid]))
 
 
 def prime_cache(args):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gelato 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-04-03 18:09+0200\n"
+"POT-Creation-Date: 2017-04-05 21:50+0200\n"
 "PO-Revision-Date: 2017-04-03 18:07+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,19 +18,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
 
-#: gelato/__init__.py:8
+#: gelato/__init__.py:11
 msgid "Contribution"
 msgstr "Dataset"
 
-#: gelato/__init__.py:9
+#: gelato/__init__.py:12
 msgid "Contributions"
 msgstr "Datasets"
 
-#: gelato/__init__.py:10
+#: gelato/__init__.py:13
 msgid "Language"
-msgstr "Sample"
+msgstr "Genetic sample"
 
-#: gelato/__init__.py:11
+#: gelato/__init__.py:14
 msgid "Languages"
-msgstr "Samples"
+msgstr "Genetic samples"
+
+#: gelato/__init__.py:15
+msgid "Parameter"
+msgstr "Measure"
+
+#: gelato/__init__.py:16
+msgid "Parameters"
+msgstr "Measures"
+
+#: gelato/__init__.py:17
+msgid "Value"
+msgstr "Measurement"
+
+#: gelato/__init__.py:18
+msgid "Values"
+msgstr "Measurements"
 
