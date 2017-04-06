@@ -1,13 +1,16 @@
 # coding: utf8
 from __future__ import unicode_literals
 import sys
+from itertools import cycle
 
 from clld.scripts.util import initializedb, Data
 from clld.db.meta import DBSession
 from clld.db.models import common
+from clld.web.icon import ORDERED_ICONS
 from clldutils.path import Path, as_unicode
 from clldutils.misc import slug
 from clldutils.dsv import reader
+from pyglottolog.api import Glottolog
 
 import gelato
 from gelato import models
@@ -31,6 +34,10 @@ def main(args):
     assert repos.exists()
     data = Data()
 
+    glottolog = Glottolog('/home/shh.mpg.de/forkel/venvs/glottolog3/glottolog')
+    languoids = {l.id: l for l in glottolog.languoids()}
+    icons = cycle(ORDERED_ICONS)
+
     dataset = common.Dataset(
         id=gelato.__name__,
         name="GeLaTo",
@@ -52,6 +59,8 @@ def main(args):
         ed = data.add(common.Contributor, id_, id=id_, name=name)
         common.Editor(dataset=dataset, contributor=ed, ord=i + 1)
 
+    families = {}
+
     for dsdir in repos.joinpath('datasets').iterdir():
         if not dsdir.is_dir():
             continue
@@ -60,19 +69,37 @@ def main(args):
         # samples.csv:
         #SamplePopID,populationName,samplesize,geographicRegion,dataSet.of.origin,lat,lon,location,languoidName,glottocode,curation_notes,Exclude
         for row in reader(dsdir.joinpath('samples.csv'), encoding='macroman', dicts=True):
+            if row['glottocode'] == 'NA':
+                continue
+
+            lang = data['Languoid'].get(row['glottocode'])
+            if not lang:
+                gl_lang = languoids[row['glottocode']]
+                gl_family = gl_lang.family or gl_lang
+                icon = families.get(gl_family.id)
+                if not icon:
+                    families[gl_family.id] = icon = icons.next()
+                lang = data.add(
+                    models.Languoid,
+                    row['glottocode'],
+                    id=row['glottocode'],
+                    name=gl_lang.name,
+                    family_id=gl_family.id,
+                    family_name=gl_family.name,
+                    jsondata=dict(icon=icon.asset_spec),
+                )
             data.add(
                 models.Sample,
                 row['SamplePopID'],
                 id=row['SamplePopID'],
                 name=row['populationName'],
+                languoid=lang,
                 latitude=float(row['lat']),
                 longitude=float(row['lon']),
                 samplesize=int(row['samplesize']),
                 source=row['dataSet.of.origin'],
                 region=row['geographicRegion'],
                 location=row['location'],
-                lang_name=row['languoidName'],
-                lang_glottocode=row['glottocode'],
                 jsondata=dict(color=REGIONS[row['geographicRegion']]),
             )
 
@@ -88,7 +115,9 @@ def main(args):
         # data.csv
         #SamplePopID,populationName,ExpectedHeterozygosity,residuals
         for i, row in enumerate(reader(dsdir.joinpath('data.csv'), dicts=True, delimiter=';')):
-            sample = data['Sample'][row['SamplePopID']]
+            sample = data['Sample'].get(row['SamplePopID'])
+            if not sample:
+                continue
             for pid in row:
                 param = data['Parameter'].get(pid)
                 if not param:

@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 
 requires = [
     'clldmpg>=1.1.0',
+    'pyglottolog',
 ]
 
 tests_require = [

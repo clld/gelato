@@ -16,7 +16,7 @@ class SamplesMap(Map):
     def get_legends(self):
         for legend in super(SamplesMap, self).get_legends():
             yield legend
-        yield FilterLegend(self, 'GELATO.getRegion', col=self.col, dt=self.dt)
+        yield FilterLegend(self, 'GELATO.getFamily', col=self.col, dt=self.dt)
 
     def get_options(self):
         return {'icon_size': 15}

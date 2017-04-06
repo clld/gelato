@@ -1,4 +1,3 @@
-
 GELATO = {
-    getRegion: function(props){return props.language.region;}
+    getFamily: function(props){return props.language.languoid.family_name;}
 };

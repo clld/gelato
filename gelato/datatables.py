@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function, division
 
+from sqlalchemy.orm import joinedload
 from clld.web.datatables.base import LinkCol, LinkToMapCol, Col
 from clld.web.datatables.language import Languages
 from clld.web.datatables.value import Values
@@ -8,15 +9,30 @@ from clld.db.util import get_distinct_values
 from clld.web.util.htmllib import HTML
 from clld.db.models.common import Parameter
 
-from gelato.models import Sample, Measurement
+from gelato.models import Sample, Measurement, Languoid
 
 
 class LangCol(Col):
     def format(self, item):
-        return HTML.a(item.lang_name, href="http://glottolog.org/resource/languoid/id/" + item.lang_glottocode)
+        return HTML.a(item.languoid.name, href="http://glottolog.org/resource/languoid/id/" + item.languoid.id)
+
+
+class FamilyCol(Col):
+    def format(self, item):
+        item = self.get_obj(item)
+        return HTML.span(
+            HTML.img(
+                width='20',
+                src=self.dt.req.static_url(item.jsondata['icon'])),
+            ' ',
+            HTML.a(item.family_name, href="http://glottolog.org/resource/languoid/id/" + item.family_id),
+            style="white-space: nowrap;")
 
 
 class Samples(Languages):
+    def base_query(self, query):
+        return query.join(Languoid).options(joinedload(Sample.languoid))
+
     def col_defs(self):
         return [
             LinkCol(self, 'name'),
@@ -25,12 +41,15 @@ class Samples(Languages):
             Col(self, 'location', model_col=Sample.location),
             Col(self,
                 'latitude',
+                input_size='mini',
                 sDescription='<small>The geographic latitude</small>'),
             Col(self,
                 'longitude',
+                input_size='mini',
                 sDescription='<small>The geographic longitude</small>'),
-            Col(self, 'samplesize', model_col=Sample.samplesize),
-            LangCol(self, 'languoid', model_col=Sample.lang_name),
+            Col(self, 'samplesize', input_size='mini', model_col=Sample.samplesize),
+            LangCol(self, 'languoid', get_object=lambda i: i.languoid, model_col=Languoid.name),
+            FamilyCol(self, 'family', get_object=lambda i: i.languoid, model_col=Languoid.family_name, choices=get_distinct_values(Languoid.family_name)),
         ]
 
 
@@ -43,11 +62,22 @@ class Measures(Parameters):
 
 
 class Measurements(Values):
+    def base_query(self, query):
+        query = Values.base_query(self, query)
+        if self.parameter:
+            query = query.join(Sample.languoid)
+        return query
+
     def col_defs(self):
         if self.parameter:
             return [
                 LinkCol(self, 'sample', model_col=Sample.name, get_object=lambda i: i.valueset.language),
-                Col(self, 'region', get_object=lambda i: i.valueset.language, format=lambda i: i.valueset.language.region),
+                Col(self,
+                    'region',
+                    model_col=Sample.region,
+                    get_object=lambda i: i.valueset.language,
+                    format=lambda i: i.valueset.language.region),
+                FamilyCol(self, 'family', get_object=lambda i: i.valueset.language.languoid, model_col=Languoid.family_name, choices=get_distinct_values(Languoid.family_name)),
                 Col(self, 'value', model_col=Measurement.value),
                 LinkToMapCol(self, '#', get_object=lambda i: i.valueset.language),
             ]
