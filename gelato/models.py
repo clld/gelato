@@ -21,7 +21,7 @@ from clld.db.models.common import Language, Value
 from gelato.interfaces import ILanguoid
 
 
-@implementer(interfaces.ILanguage)
+@implementer(interfaces.IValue)
 class Measurement(CustomModelMixin, Value):
     pk = Column(Integer, ForeignKey('value.pk'), primary_key=True)
     value = Column(Float)

@@ -1,6 +1,6 @@
 from pyramid.config import Configurator
 
-from clld.interfaces import IMapMarker, ILanguage, IIcon, IValueSet
+from clld.interfaces import IMapMarker, ILanguage, IIcon, IValueSet, IValue
 from clld.web.icon import MapMarker
 
 # we must make sure custom models are known at database initialization!
@@ -26,6 +26,9 @@ class GelatoMapMarker(MapMarker):
 
         if ILanguage.providedBy(ctx):
             return req.static_url(ctx.languoid.jsondata['icon'])
+
+        if IValue.providedBy(ctx):
+            return req.static_url(ctx.valueset.language.languoid.jsondata['icon'])
 
         if IValueSet.providedBy(ctx):
             return req.static_url(ctx.language.languoid.jsondata['icon'])
