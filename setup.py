@@ -4,7 +4,8 @@ from setuptools import setup, find_packages
 requires = [
     'clldmpg~=3.1',
     'pyglottolog',
-    'clld~=4.0'
+    'clld~=4.0',
+    'waitress',
 ]
 
 tests_require = [
