@@ -1,19 +1,6 @@
 from setuptools import setup, find_packages
 
 
-requires = [
-    'clldmpg~=3.1',
-    'pyglottolog',
-    'clld~=4.0',
-    'waitress',
-]
-
-tests_require = [
-    'WebTest >= 1.3.1',  # py3 compat
-    'mock==1.0.0',
-]
-
-
 setup(
     name='gelato',
     version='0.0',
@@ -24,6 +11,12 @@ setup(
         "Framework :: Pyramid",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+    ],
+    install_requires=[
+        'clldmpg~=3.1',
+        'pyglottolog',
+        'clld~=4.0',
+        'waitress',
     ],
     extras_require={
         'dev': ['flake8', 'waitress', 'psycopg2'],
@@ -46,8 +39,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=requires,
-    tests_require=tests_require,
     test_suite="gelato",
     entry_points="""\
 [paste.app_factory]
