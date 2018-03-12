@@ -16,7 +16,6 @@ setup(
         'clld~=4.0',
         'clldmpg~=3.1',
         'pyglottolog',
-        'clld~=4.0',
         'sqlalchemy',
         'waitress',
     ],
