@@ -34,7 +34,7 @@ def main(args):
     assert repos.exists()
     data = Data()
 
-    glottolog = Glottolog('/home/shh.mpg.de/forkel/venvs/glottolog3/glottolog')
+    glottolog = Glottolog(repos.parent.parent / 'glottolog' / 'glottolog')
     languoids = {l.id: l for l in glottolog.languoids()}
     icons = cycle(ORDERED_ICONS)
 
@@ -78,7 +78,7 @@ def main(args):
                 gl_family = gl_lang.family or gl_lang
                 icon = families.get(gl_family.id)
                 if not icon:
-                    families[gl_family.id] = icon = icons.next()
+                    families[gl_family.id] = icon = next(icons)
                 lang = data.add(
                     models.Languoid,
                     row['glottocode'],
