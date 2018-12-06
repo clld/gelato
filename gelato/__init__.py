@@ -2,6 +2,7 @@ from pyramid.config import Configurator
 
 from clld.interfaces import IMapMarker, ILanguage, IIcon, IValueSet, IValue
 from clld.web.icon import MapMarker
+from clld.lib import svg
 
 # we must make sure custom models are known at database initialization!
 from gelato import models
@@ -23,15 +24,18 @@ class GelatoMapMarker(MapMarker):
     def __call__(self, ctx, req):
         #if ILanguage.providedBy(ctx) or IValueSet.providedBy(ctx):
         #    return req.registry.getUtility(IIcon, 'c{0}'.format(ctx.jsondata['color'])).url(req)
-
+        icon = None
         if ILanguage.providedBy(ctx):
-            return req.static_url(ctx.languoid.jsondata['icon'])
-
-        if IValue.providedBy(ctx):
-            return req.static_url(ctx.valueset.language.languoid.jsondata['icon'])
-
-        if IValueSet.providedBy(ctx):
-            return req.static_url(ctx.language.languoid.jsondata['icon'])
+            icon = ctx.languoid.jsondata['icon']
+        elif IValue.providedBy(ctx):
+            icon = ctx.jsondata['icon']
+        elif IValueSet.providedBy(ctx):
+            icon = ctx.jsondata['icon']
+        if icon:
+            try:
+                return svg.data_url(svg.icon(icon))
+            except:
+                raise ValueError(icon)
 
         return super(GelatoMapMarker, self).__call__(ctx, req)  # pragma: no cover
 

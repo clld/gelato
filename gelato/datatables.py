@@ -9,6 +9,7 @@ from clld.web.datatables.contribution import Contributions
 from clld.db.util import get_distinct_values
 from clld.web.util.htmllib import HTML
 from clld.db.models.common import Parameter
+from clld.lib import svg
 
 from gelato.models import Sample, Measurement, Languoid, Panel, Measure
 
@@ -24,7 +25,7 @@ class FamilyCol(Col):
         return HTML.span(
             HTML.img(
                 width='20',
-                src=self.dt.req.static_url(item.jsondata['icon'])),
+                src=svg.data_url(svg.icon(item.jsondata['icon']))),
             ' ',
             HTML.a(item.family_name, href="http://glottolog.org/resource/languoid/id/" + item.family_id),
             style="white-space: nowrap;")

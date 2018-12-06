@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 import sys
 from itertools import cycle
+from colorsys import hsv_to_rgb
 
+from sqlalchemy.orm import joinedload_all
 from clld.scripts.util import initializedb, Data
 from clld.db.meta import DBSession
 from clld.db.models import common
@@ -97,7 +99,7 @@ def main(args):
                     name=gl_lang.name,
                     family_id=gl_family.id,
                     family_name=gl_family.name,
-                    jsondata=dict(icon=icon.asset_spec),
+                    jsondata=dict(icon=icon.name),
                 )
             data.add(
                 models.Sample,
@@ -157,11 +159,27 @@ def main(args):
                     value=float(row[pid]))
 
 
+def color(minval, maxval, val):  # pragma: no cover
+    """ Convert val in range minval..maxval to the range 0..120 degrees which
+        correspond to the colors Red and Green in the HSV colorspace.
+    """
+    h = 120 - (float(val-minval) / (maxval-minval)) * 120
+
+    # Convert hsv color (h,1,1) to its rgb equivalent.
+    # Note: hsv_to_rgb() function expects h to be in the range 0..1 not 0..360
+    return ''.join("{0:02x}".format(int(255*n)) for n in hsv_to_rgb(h/360, 1., 1.))
+
+
 def prime_cache(args):
     """If data needs to be denormalized for lookup, do that here.
     This procedure should be separate from the db initialization, because
     it will have to be run periodically whenever data has been updated.
     """
+    for p in DBSession.query(common.Parameter).options(joinedload_all(common.Parameter.valuesets, common.ValueSet.values)):
+        minval = min(vs.values[0].value for vs in p.valuesets)
+        maxval = max(vs.values[0].value for vs in p.valuesets)
+        for vs in p.valuesets:
+            vs.values[0].jsondata = vs.jsondata = {'icon': 's' + color(minval, maxval, vs.values[0].value)}
 
 
 if __name__ == '__main__':
