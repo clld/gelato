@@ -5,11 +5,12 @@ from clld.web.datatables.base import LinkCol, LinkToMapCol, Col
 from clld.web.datatables.language import Languages
 from clld.web.datatables.value import Values
 from clld.web.datatables.parameter import Parameters
+from clld.web.datatables.contribution import Contributions
 from clld.db.util import get_distinct_values
 from clld.web.util.htmllib import HTML
 from clld.db.models.common import Parameter
 
-from gelato.models import Sample, Measurement, Languoid
+from gelato.models import Sample, Measurement, Languoid, Panel, Measure
 
 
 class LangCol(Col):
@@ -30,7 +31,12 @@ class FamilyCol(Col):
 
 
 class Samples(Languages):
+    __constraints__ = [Panel]
+
     def base_query(self, query):
+        query = query.join(Sample.panel)
+        if self.panel:
+            query = query.filter(Panel.pk == self.panel.pk)
         return query.join(Languoid).options(joinedload(Sample.languoid))
 
     def col_defs(self):
@@ -54,11 +60,22 @@ class Samples(Languages):
 
 
 class Measures(Parameters):
+    __constraints__ = [Panel]
+
+    def base_query(self, query):
+        query = query.join(Measure.panel)
+        if self.panel:
+            query = query.filter(Panel.pk == self.panel.pk)
+        return query
+
     def col_defs(self):
-        return [
+        res = [
             LinkCol(self, 'name'),
             Col(self, 'description'),
         ]
+        if not self.panel:
+            res.append(LinkCol(self, 'panel', get_object=lambda i: i.panel))
+        return res
 
 
 class Measurements(Values):
@@ -90,7 +107,16 @@ class Measurements(Values):
         return Values.col_defs(self)
 
 
+class Panels(Contributions):
+    def col_defs(self):
+        return [
+            LinkCol(self, 'name'),
+            Col(self, 'description', format=lambda i: i.formatted_description),
+        ]
+
+
 def includeme(config):
     config.register_datatable('languages', Samples)
     config.register_datatable('values', Measurements)
     config.register_datatable('parameters', Measures)
+    config.register_datatable('contributions', Panels)

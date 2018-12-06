@@ -12,19 +12,36 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from markdown import markdown
 
 from clld import interfaces
 from clld.db.meta import Base, CustomModelMixin
 from clld.db.models import IdNameDescriptionMixin
-from clld.db.models.common import Language, Value
+from clld.db.models.common import Language, Value, Contribution, Parameter
 
 from gelato.interfaces import ILanguoid
+
+
+@implementer(interfaces.IContribution)
+class Panel(CustomModelMixin, Contribution):
+    pk = Column(Integer, ForeignKey('contribution.pk'), primary_key=True)
+
+    @property
+    def formatted_description(self):
+        return markdown(self.description)
 
 
 @implementer(interfaces.IValue)
 class Measurement(CustomModelMixin, Value):
     pk = Column(Integer, ForeignKey('value.pk'), primary_key=True)
     value = Column(Float)
+
+
+@implementer(interfaces.IParameter)
+class Measure(CustomModelMixin, Parameter):
+    pk = Column(Integer, ForeignKey('parameter.pk'), primary_key=True)
+    panel_pk = Column(Integer, ForeignKey('panel.pk'))
+    panel = relationship(Panel, backref='measures')
 
 
 @implementer(ILanguoid)
@@ -38,6 +55,8 @@ class Sample(CustomModelMixin, Language):
     pk = Column(Integer, ForeignKey('language.pk'), primary_key=True)
     languoid_pk = Column(Integer, ForeignKey('languoid.pk'))
     languoid = relationship(Languoid, backref='samples')
+    panel_pk = Column(Integer, ForeignKey('panel.pk'))
+    panel = relationship(Panel, backref='samples')
     samplesize = Column(Integer)
     region = Column(Unicode)
     location = Column(Unicode)

@@ -20,11 +20,11 @@ msgstr ""
 
 #: gelato/__init__.py:11
 msgid "Contribution"
-msgstr "Dataset"
+msgstr "Panel"
 
 #: gelato/__init__.py:12
 msgid "Contributions"
-msgstr "Datasets"
+msgstr "Panels"
 
 #: gelato/__init__.py:13
 msgid "Language"

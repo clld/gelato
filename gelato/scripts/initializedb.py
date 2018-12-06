@@ -7,7 +7,7 @@ from clld.scripts.util import initializedb, Data
 from clld.db.meta import DBSession
 from clld.db.models import common
 from clld.web.icon import ORDERED_ICONS
-from clldutils.path import Path, as_unicode
+from clldutils.path import Path, as_unicode, read_text
 from clldutils.misc import slug
 from clldutils.dsv import reader
 from pyglottolog.api import Glottolog
@@ -68,7 +68,13 @@ def main(args):
         if not dsdir.is_dir():
             continue
 
-        ds = data.add(common.Contribution, dsdir.name, id=slug(as_unicode(dsdir.name)), name=dsdir.name)
+        ds = data.add(
+            models.Panel,
+            dsdir.name,
+            id=slug(as_unicode(dsdir.name)),
+            name=dsdir.name,
+            description=read_text(dsdir / 'README.md'),
+        )
         # samples.csv:
         #SamplePopID,populationName,samplesize,geographicRegion,dataSet.of.origin,lat,lon,location,languoidName,glottocode,curation_notes,Exclude
         for row in reader(dsdir.joinpath('samples.csv'), encoding='macroman', dicts=True):
@@ -98,6 +104,7 @@ def main(args):
                 row['SamplePopID'],
                 id='{0}-{1}'.format(ds.id, row['SamplePopID']),
                 name=row['populationName'],
+                panel=ds,
                 languoid=lang,
                 latitude=float(row['lat']) if row['lat'] != 'NA' else None,
                 longitude=float(row['lon']) if row['lon'] != 'NA' else None,
@@ -111,11 +118,12 @@ def main(args):
         #VarID,Variable name,Description,Source
         for row in reader(dsdir.joinpath('variables.csv'), dicts=True):
             data.add(
-                common.Parameter,
+                models.Measure,
                 row['VarID'],
                 id='{0}-{1}'.format(ds.id, row['VarID']),
                 name=row['Variable name'],
-                description=row['Description'])
+                description=row['Description'],
+                panel=ds)
 
         # data.csv
         #SamplePopID,populationName,ExpectedHeterozygosity,residuals
@@ -124,7 +132,7 @@ def main(args):
             if not sample:
                 continue
             for pid in row:
-                param = data['Parameter'].get(pid)
+                param = data['Measure'].get(pid)
                 if not param:
                     continue
 
