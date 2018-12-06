@@ -17,13 +17,16 @@ from gelato import models
 
 REGIONS = {
     'EAST_ASIA': '0000ff',
+    'SOUTHEAST_ASIA': '0000ff',
     'AFROEUROPEAN': '00ff00',
     'LATINO': 'ff0000',
     'MIDDLE_EAST': '00ffff',
     'CENTRAL_SOUTH_ASIA': 'ff00ff',
     'AFRICA': 'ffff00',
     'EUROPE': '000000',
+    'EURASIA': '000000',
     'AMERICA': 'cccccc',
+    'AMERICAS': 'cccccc',
     'OCEANIA': 'ffffff',
 }
 
@@ -74,6 +77,8 @@ def main(args):
 
             lang = data['Languoid'].get(row['glottocode'])
             if not lang:
+                if row['glottocode'] not in languoids:
+                    continue
                 gl_lang = languoids[row['glottocode']]
                 gl_family = gl_lang.family or gl_lang
                 icon = families.get(gl_family.id)
@@ -91,13 +96,13 @@ def main(args):
             data.add(
                 models.Sample,
                 row['SamplePopID'],
-                id=row['SamplePopID'],
+                id='{0}-{1}'.format(ds.id, row['SamplePopID']),
                 name=row['populationName'],
                 languoid=lang,
-                latitude=float(row['lat']),
-                longitude=float(row['lon']),
+                latitude=float(row['lat']) if row['lat'] != 'NA' else None,
+                longitude=float(row['lon']) if row['lon'] != 'NA' else None,
                 samplesize=int(row['samplesize']),
-                source=row['dataSet.of.origin'],
+                source=row.get('dataSet.of.origin'),
                 region=row['geographicRegion'],
                 location=row['location'],
                 jsondata=dict(color=REGIONS[row['geographicRegion']]),
@@ -108,7 +113,7 @@ def main(args):
             data.add(
                 common.Parameter,
                 row['VarID'],
-                id=row['VarID'],
+                id='{0}-{1}'.format(ds.id, row['VarID']),
                 name=row['Variable name'],
                 description=row['Description'])
 
@@ -121,6 +126,9 @@ def main(args):
             for pid in row:
                 param = data['Parameter'].get(pid)
                 if not param:
+                    continue
+
+                if row[pid] == 'NA':
                     continue
 
                 vs = data.add(
