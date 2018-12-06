@@ -34,6 +34,8 @@ class SamplesMap(Map):
 
     def get_legends(self):
         for legend in super(SamplesMap, self).get_legends():
+            if legend.name == 'layers':
+                legend.label = 'Panels'
             yield legend
         yield FilterLegend(self, 'GELATO.getFamily', col=self.col, dt=self.dt)
 
