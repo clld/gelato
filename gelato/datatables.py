@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, print_function, division
-
 from sqlalchemy.orm import joinedload
 from clld.web.datatables.base import LinkCol, LinkToMapCol, Col
 from clld.web.datatables.language import Languages
@@ -9,7 +7,7 @@ from clld.web.datatables.contribution import Contributions
 from clld.db.util import get_distinct_values
 from clld.web.util.htmllib import HTML
 from clld.db.models.common import Parameter
-from clld.lib import svg
+from clldutils import svg
 
 from gelato.models import Sample, Measurement, Languoid, Panel, Measure
 

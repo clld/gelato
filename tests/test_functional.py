@@ -12,8 +12,8 @@ import pytest
     [
         ('get_html', '/'),
         ('get_html', '/contributions/pembertonautosomalstr'),
-        ('get_html', '/parameters/heterozygosity#2/21.1/0.9'),
-        ('get_html', '/languages/1185'),
+        ('get_html', '/parameters/pembertonautosomalstr-heterozygosity'),
+        ('get_html', '/languages/humanoriginsautosomalsnp-26'),
     ])
 def test_pages(app, method, path):
     getattr(app, method)(path)

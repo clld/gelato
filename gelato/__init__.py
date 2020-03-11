@@ -2,7 +2,7 @@ from pyramid.config import Configurator
 
 from clld.interfaces import IMapMarker, ILanguage, IIcon, IValueSet, IValue
 from clld.web.icon import MapMarker
-from clld.lib import svg
+from clldutils import svg
 
 # we must make sure custom models are known at database initialization!
 from gelato import models
