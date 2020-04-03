@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from sqlalchemy.orm import joinedload
 from clld.web.maps import ParameterMap, Map, FilterLegend, Layer
 from clld.web.adapters.geojson import GeoJsonLanguages

@@ -1,17 +1,15 @@
-# coding: utf8
-from __future__ import unicode_literals
 import sys
 from itertools import cycle
 from colorsys import hsv_to_rgb
 
-from sqlalchemy.orm import joinedload_all
+from sqlalchemy.orm import joinedload
 from clld.scripts.util import initializedb, Data
 from clld.db.meta import DBSession
 from clld.db.models import common
 from clld.web.icon import ORDERED_ICONS
 from clldutils.path import Path, as_unicode, read_text
 from clldutils.misc import slug
-from clldutils.dsv import reader
+from csvw.dsv import reader
 from pyglottolog.api import Glottolog
 
 import gelato
@@ -175,7 +173,8 @@ def prime_cache(args):
     This procedure should be separate from the db initialization, because
     it will have to be run periodically whenever data has been updated.
     """
-    for p in DBSession.query(common.Parameter).options(joinedload_all(common.Parameter.valuesets, common.ValueSet.values)):
+    for p in DBSession.query(common.Parameter).options(
+            joinedload(common.Parameter.valuesets).joinedload(common.ValueSet.values)):
         minval = min(vs.values[0].value for vs in p.valuesets)
         maxval = max(vs.values[0].value for vs in p.valuesets)
         for vs in p.valuesets:

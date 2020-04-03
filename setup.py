@@ -13,7 +13,7 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
     ],
     install_requires=[
-        'clld>=5',
+        'clld>=6',
         'clldmpg>=3.5',
         'pyglottolog',
         'sqlalchemy',
@@ -27,7 +27,7 @@ setup(
         'test': [
             'mock',
             'psycopg2',
-            'pytest>=3.1',
+            'pytest>=3.6',
             'pytest-clld',
             'pytest-mock',
             'pytest-cov',
