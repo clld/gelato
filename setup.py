@@ -13,8 +13,8 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
     ],
     install_requires=[
-        'clld>=6',
-        'clldmpg>=3.5',
+        'clld>=8',
+        'clldmpg>=4.2',
         'pyglottolog',
         'sqlalchemy',
         'waitress',
