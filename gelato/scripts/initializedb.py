@@ -1,16 +1,13 @@
-import sys
 from itertools import cycle
 from colorsys import hsv_to_rgb
 
 from sqlalchemy.orm import joinedload
-from clld.scripts.util import initializedb, Data
+from clld.cliutil import Data, bibtex2source
 from clld.db.meta import DBSession
 from clld.db.models import common
 from clld.web.icon import ORDERED_ICONS
-from clldutils.path import Path, as_unicode, read_text
-from clldutils.misc import slug
-from csvw.dsv import reader
-from pyglottolog.api import Glottolog
+from clld.lib import bibtex
+from csvw import Datatype
 
 import gelato
 from gelato import models
@@ -30,24 +27,18 @@ REGIONS = {
     'OCEANIA': 'ffffff',
 }
 
-
 def main(args):
-    repos = Path(__file__).parent.resolve().parent.parent.parent.joinpath('gelato-data')
-    print(repos)
-    assert repos.exists()
     data = Data()
 
-    glottolog = Glottolog(repos.parent.parent / 'glottolog' / 'glottolog')
-    languoids = {l.id: l for l in glottolog.languoids()}
     icons = cycle(ORDERED_ICONS)
 
     dataset = common.Dataset(
         id=gelato.__name__,
         name="GeLaTo",
         description="Genes and Languages together",
-        publisher_name="Max Planck Institute for the Science of Human History",
-        publisher_place="Jena",
-        publisher_url="http://www.shh.mpg.de",
+        publisher_name="Max Planck Institute for Evolutionary Anthropology",
+        publisher_place="Leipzig",
+        publisher_url="https://www.eva.mpg.de",
         license="http://creativecommons.org/licenses/by/4.0/",
         domain='gelato.clld.org',
         jsondata={
@@ -64,97 +55,78 @@ def main(args):
 
     families = {}
 
-    for dsdir in repos.joinpath('datasets').iterdir():
-        if not dsdir.is_dir():
-            continue
+    for rec in bibtex.Database.from_file(args.cldf.bibpath, lowercase=True):
+        data.add(common.Source, rec.id, _obj=bibtex2source(rec))
 
+    for r in args.cldf.iter_rows('ContributionTable', 'id', 'name', 'description'):
         ds = data.add(
-            models.Panel,
-            dsdir.name,
-            id=slug(as_unicode(dsdir.name)),
-            name=dsdir.name,
-            description=read_text(dsdir / 'README.md'),
-        )
-        # samples.csv:
-        #SamplePopID,populationName,samplesize,geographicRegion,dataSet.of.origin,lat,lon,location,languoidName,glottocode,curation_notes,Exclude
-        for row in reader(dsdir.joinpath('samples.csv'), encoding='macroman', dicts=True):
-            if row['glottocode'] == 'NA':
-                continue
-
-            lang = data['Languoid'].get(row['glottocode'])
-            if not lang:
-                if row['glottocode'] not in languoids:
-                    continue
-                gl_lang = languoids[row['glottocode']]
-                gl_family = gl_lang.family or gl_lang
-                icon = families.get(gl_family.id)
-                if not icon:
-                    families[gl_family.id] = icon = next(icons)
-                lang = data.add(
-                    models.Languoid,
-                    row['glottocode'],
-                    id=row['glottocode'],
-                    name=gl_lang.name,
-                    family_id=gl_family.id,
-                    family_name=gl_family.name,
-                    jsondata=dict(icon=icon.name),
-                )
-            data.add(
-                models.Sample,
-                row['SamplePopID'],
-                id='{0}-{1}'.format(ds.id, row['SamplePopID']),
-                name=row['populationName'],
-                panel=ds,
-                languoid=lang,
-                latitude=float(row['lat']) if row['lat'] != 'NA' else None,
-                longitude=float(row['lon']) if row['lon'] != 'NA' else None,
-                samplesize=int(row['samplesize']),
-                source=row.get('dataSet.of.origin'),
-                region=row['geographicRegion'],
-                location=row['location'],
-                jsondata=dict(color=REGIONS[row['geographicRegion']]),
+            models.Panel, r['id'], id=r['id'], name=r['name'], description=r['description'])
+    for row in args.cldf.iter_rows('LanguageTable', 'id', 'name', 'contributionReference'):
+        icon = families.get(row['LanguageFamily_Glottocode'])
+        if not icon:
+            families[row['LanguageFamily_Glottocode']] = icon = next(icons)
+        lang = data['Languoid'].get(row['Glottocode'])
+        if not lang:
+            lang = data.add(
+                models.Languoid,
+                row['Glottocode'],
+                id=row['Glottocode'],
+                name=row['Language_Name'],
+                family_id=row['LanguageFamily_Glottocode'],
+                family_name=row['LanguageFamily'],
+                jsondata=dict(icon=icon.name),
             )
+        s = data.add(
+            models.Sample,
+            row['id'],
+            id=row['id'],
+            name=row['Name'],
+            panel=data['Panel'][row['contributionReference']],
+            languoid=lang,
+            latitude=row['Latitude'],
+            longitude=row['Longitude'],
+            samplesize=int(row['samplesize']),
+            #source=row.get('dataSet.of.origin'),
+            region=row['geographicRegion'],
+            #location=row['location'],
+            jsondata=dict(color=REGIONS[row['geographicRegion']]),
+        )
+        DBSession.flush()
+        for bibkey in row['Source']:
+            DBSession.add(
+                common.LanguageSource(language_pk=s.pk, source_pk=data['Source'][bibkey].pk))
 
-        #VarID,Variable name,Description,Source
-        for row in reader(dsdir.joinpath('variables.csv'), dicts=True):
+    types = {}
+    for row in args.cldf.iter_rows(
+            'ParameterTable', 'id', 'name', 'description', 'contributionReference'):
+        types[row['id']] = Datatype.fromvalue(row['datatype'])
+        data.add(
+            models.Measure,
+            row['id'],
+            id=row['id'],
+            name=row['name'],
+            description=row['description'],
+            panel=data['Panel'][row['contributionReference']])
+
+    for row in args.cldf.iter_rows('ValueTable', 'id', 'parameterReference', 'languageReference'):
+        v = types[row['parameterReference']].read(row['Value'])
+        if isinstance(v, float):
+            vs = data.add(
+                common.ValueSet,
+                row['id'],
+                id=row['id'],
+                language=data['Sample'][row['languageReference']],
+                parameter=data['Measure'][row['parameterReference']],
+                #contribution=ds,
+                #jsondata=dict(color=REGIONS[sample.region]),
+            )
             data.add(
-                models.Measure,
-                row['VarID'],
-                id='{0}-{1}'.format(ds.id, row['VarID']),
-                name=row['Variable name'],
-                description=row['Description'],
-                panel=ds)
-
-        # data.csv
-        #SamplePopID,populationName,ExpectedHeterozygosity,residuals
-        for i, row in enumerate(reader(dsdir.joinpath('data.csv'), dicts=True, delimiter=';')):
-            sample = data['Sample'].get(row['SamplePopID'])
-            if not sample:
-                continue
-            for pid in row:
-                param = data['Measure'].get(pid)
-                if not param:
-                    continue
-
-                if row[pid] == 'NA':
-                    continue
-
-                vs = data.add(
-                    common.ValueSet,
-                    i,
-                    id='{0}-{1}-{2}'.format(ds.id, param.id, i + 1),
-                    language=sample,
-                    parameter=param,
-                    contribution=ds,
-                    jsondata=dict(color=REGIONS[sample.region]),
-                )
-                data.add(
-                    models.Measurement,
-                    i,
-                    id='{0}-{1}-{2}'.format(ds.id, param.id, i + 1),
-                    valueset=vs,
-                    name='{0:.2}'.format(float(row[pid])),
-                    value=float(row[pid]))
+                models.Measurement,
+                row['id'],
+                id=row['id'],
+                valueset=vs,
+                name=row['Value'],
+                value=v)
 
 
 def color(minval, maxval, val):  # pragma: no cover
@@ -175,12 +147,8 @@ def prime_cache(args):
     """
     for p in DBSession.query(common.Parameter).options(
             joinedload(common.Parameter.valuesets).joinedload(common.ValueSet.values)):
-        minval = min(vs.values[0].value for vs in p.valuesets)
-        maxval = max(vs.values[0].value for vs in p.valuesets)
-        for vs in p.valuesets:
-            vs.values[0].jsondata = vs.jsondata = {'icon': 's' + color(minval, maxval, vs.values[0].value)}
-
-
-if __name__ == '__main__':
-    initializedb(create=main, prime_cache=prime_cache)
-    sys.exit(0)
+        if p.valuesets:
+            minval = min(vs.values[0].value for vs in p.valuesets)
+            maxval = max(vs.values[0].value for vs in p.valuesets)
+            for vs in p.valuesets:
+                vs.values[0].jsondata = vs.jsondata = {'icon': 's' + color(minval, maxval, vs.values[0].value)}
