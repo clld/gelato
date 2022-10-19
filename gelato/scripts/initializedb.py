@@ -42,6 +42,7 @@ def main(args):
         license="http://creativecommons.org/licenses/by/4.0/",
         domain='gelato.clld.org',
         jsondata={
+            'citation': args.cldf.properties['dc:bibliographicCitation'],
             'license_icon': 'cc-by.png',
             'license_name': 'Creative Commons Attribution 4.0 International License'})
 
