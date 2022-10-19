@@ -28,7 +28,7 @@ class Panel(CustomModelMixin, Contribution):
 
     @property
     def formatted_description(self):
-        return markdown(self.description)
+        return markdown(self.description.replace('#', '###'))
 
 
 @implementer(interfaces.IValue)

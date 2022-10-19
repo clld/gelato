@@ -86,9 +86,8 @@ def main(args):
             latitude=row['Latitude'],
             longitude=row['Longitude'],
             samplesize=int(row['samplesize']),
-            #source=row.get('dataSet.of.origin'),
             region=row['geographicRegion'],
-            #location=row['location'],
+            location=row['country'],
             jsondata=dict(color=REGIONS[row['geographicRegion']]),
         )
         DBSession.flush()
@@ -100,17 +99,18 @@ def main(args):
     for row in args.cldf.iter_rows(
             'ParameterTable', 'id', 'name', 'description', 'contributionReference'):
         types[row['id']] = Datatype.fromvalue(row['datatype'])
-        data.add(
-            models.Measure,
-            row['id'],
-            id=row['id'],
-            name=row['name'],
-            description=row['description'],
-            panel=data['Panel'][row['contributionReference']])
+        if types[row['id']].base in ['float', 'integer']:
+            data.add(
+                models.Measure,
+                row['id'],
+                id=row['id'],
+                name=row['name'],
+                description=row['description'],
+                panel=data['Panel'][row['contributionReference']])
 
     for row in args.cldf.iter_rows('ValueTable', 'id', 'parameterReference', 'languageReference'):
         v = types[row['parameterReference']].read(row['Value'])
-        if isinstance(v, float):
+        if isinstance(v, (float, int)):
             vs = data.add(
                 common.ValueSet,
                 row['id'],
