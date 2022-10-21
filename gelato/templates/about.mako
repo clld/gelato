@@ -17,7 +17,9 @@
 <p>Concept supervision: Russell Gray, Balthasar Bickel, Kentaro Shimizu.</p>
 <p>The curation of the dataset for glottocode assignation was performed by Barbieri, Blasi and Forkel with the expertise of Harald Hammarström, and the support of various contributors: Søren Wichmann, Simon J. Greenhill, Balthasar Bickel, Russell Gray, Natalia Chousou-Polydouri, Paul Heggarty, Tom Güldemann, Matthias Urban, Brigitte Pakendorf, Jessica Ivani, Kellen Parker van Dam, Anne-Maria Fehn, Hiba Babiker, Nora Muheim.</p>
 <p>Details on the contribution for each genetic population is listed in the ${h.external_link("https://github.com/gelato-org/gelato-data/blob/master/datasets/HumanOrigins_AutosomalSNP/samples.csv", label="dataset curation notes")}.</p>
-<p>Chiara Barbieri was supported by funds from the [URPP Evolution in Action](https://www.evolution.uzh.ch/en.html) program of the University of Zurich and from the [NCCR Evolving languages](https://evolvinglanguage.ch/) of the Swiss National Science Fundation.</p>
+<p>Chiara Barbieri was supported by funds from the
+    ${h.external_link("https://www.evolution.uzh.ch/en.html", label="URPP Evolution in Action")} program of the University of Zurich and from the
+    ${h.external_link("https://evolvinglanguage.ch/", label="NCCR Evolving Language")} grant of the Swiss National Science Fundation.</p>
 
 <h3>Contributing</h3>
 <p>Glottolog data is curated in a public repository at  https://github.com/gelato-org/gelato-data. We welcome suggestions for:</p>
