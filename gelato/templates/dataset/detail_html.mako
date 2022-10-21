@@ -4,7 +4,7 @@
     ##<div class="well">
         ##<h3>Sidebar</h3>
         <p>
-            <img class="image" src="${request.static_url('gelato:static/gelato_logo.png')}" />
+            <img class="image" src="${request.static_url('gelato:static/nlogo.png')}" />
         </p>
     ##</div>
 </%def>
