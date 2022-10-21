@@ -6,16 +6,14 @@
 <div class="alert alert-info">
     <p>
         The GeLaTo web application serves the latest
-        ${h.external_link('https://github.com/lexibank/papuanvoices/releases', label=_('released version'))}
+        ${h.external_link('https://github.com/gelato-org/gelato-data/releases', label=_('released version'))}
         of data curated at
         ${h.external_link('https://github.com/gelato-org/gelato-data', label='gelato-org/gelato')}.
         All released version are accessible via
-
-        <a href="https://doi.org/10.5281/zenodo.">
-            <img src="https://zenodo.org/badge/DOI/10.5281/zenodo..svg" alt="DOI">
+        <a href="https://doi.org/10.5281/zenodo.7233266">
+            <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.7233266.svg" alt="DOI">
         </a>
         <br/>
-
         on ZENODO as well.
     </p>
 </div>

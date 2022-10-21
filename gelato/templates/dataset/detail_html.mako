@@ -26,14 +26,18 @@
     ${h.external_link('https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3656735/', label='Pemberton et al. 2013')}
     It will be expanded to include mtDNA genomes, Y chromosome STRs, and autosomal SNPs.
 </p>
-<p>
-GeLaTo goals:
-</p>
+<h3>Goals</h3>
 <ul>
     <li>Allowing geneticists to properly characterize the human history behind the molecular data, and give an accessible reference dataset for regional or worldwide comparisons.</li>
     <li>Allowing linguists, historians and cultural anthropologists to integrate information on genealogical relatedness and demography, which can be robustly extrapolated from the genetic data.</li>
     <li>Allowing scholars of various disciplines to approach questions of major relevance on human diversity in a true multidisciplinary perspective, and develop a more realistic understanding of the complex mechanisms behind human migration, contact and cultural transmission.</li>
 </ul>
+<h3>How to cite</h3>
+<p>If you use this data, please cite</p>
+<blockquote>
+    ${req.dataset.jsondata['citation']}
+</blockquote>
+<p>as well as the ${h.external_link('https://github.com/gelato-org/gelato-data/releases', label=_('released version'))} of the dataset.</p>
 <p>
     <small>
         Icons made by
