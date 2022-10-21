@@ -43,8 +43,8 @@ def main(args):
         domain='gelato.clld.org',
         jsondata={
             'citation': args.cldf.properties['dc:bibliographicCitation'],
-            'license_icon': 'cc-by.png',
-            'license_name': 'Creative Commons Attribution 4.0 International License'})
+            'license_icon': 'cc-by-nc.png',
+            'license_name': 'Creative Commons Attribution Non Commercial 4.0 International License'})
 
     for i, (id_, name) in enumerate([
         ('barbierichiara', 'Chiara Barbieri'),
