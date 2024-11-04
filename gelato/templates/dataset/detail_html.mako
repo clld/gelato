@@ -1,32 +1,67 @@
 <%inherit file="../home_comp.mako"/>
 
-<%def name="sidebar()">
-    ##<div class="well">
-        ##<h3>Sidebar</h3>
-        <p>
-            <img class="image" src="${request.static_url('gelato:static/nlogo.png')}" />
-        </p>
-    ##</div>
-</%def>
 
 <h2>GELATO: GEnes and LAnguages TOgether</h2>
 
+<p class="lead">a resource for multidisciplinary studies on human genetic and linguistic variation</p>
+
+<div style="float: right;">
+       <img class="image" src="${request.static_url('gelato:static/nlogo.png')}" />
+</div>
 <p>
     The GeLaTo dataset is a worldwide diversity panel of available population genetic samples
-    matched with databases of linguistic, cultural and environmental diversity. Population genetic
-    samples are assigned to existing GlottoCodes, following ethnolinguistic criteria: the data is
-    filtered following the indication of geneticists, linguists, cultural anthropologists and historians.
-    The choice of genetic data corresponds to essential guidelines: maximum compatibility and
-    standardization, modern high quality data, avoidance of ascertainment bias, availability for
-    different regions of the world, and finally high resolution to capture recent events. The dataset
-    provides elaborated summary statistics such as genetic diversity within a population, genetic proximity
-    between pairs of populations, sharing of identical motifs, and demographic history reconstructions. The
-    genetic samples are directly linked to Glottolog and D-Place databases, and to the original publication.
-    The current version hosts summary statistics from the genetic diversity panel of autosomal STR from
-    ${h.external_link('https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3656735/', label='Pemberton et al. 2013')}
-    It will be expanded to include mtDNA genomes, Y chromosome STRs, and autosomal SNPs.
+    matched with databases of linguistic diversity. Each genetic population is associated to the
+    main language spoken by their people. The choice of genetic data corresponds to essential
+    guidelines: maximum compatibility and standardization, modern high quality data, avoidance of
+    ascertainment bias, availability for different regions of the world, and high resolution to
+    capture recent events. The dataset provides elaborated summary statistics such as genetic
+    diversity within a population, genetic proximity between pairs of populations, sharing of
+    identical motifs, and demographic history reconstructions.
 </p>
-<h3>Goals</h3>
+<p>
+    The resource is designed to explore connections between our linguistic diversity and the history
+    and diversity of human groups. The use of the scientific information in GeLaTo should be carried
+    with respect of people culture and traditions.
+</p>
+
+
+<h3>Linguistic and Anthropological curation:</h3>
+<p>
+All the genetic populations considered are matched with a unique GlottoCode identifier, which corresponds
+to the main language spoken by the population. This information is recovered from the original genetic
+publication, and it is extrapolated either from direct sampling observation, cultural/linguistic
+self-identification, or geographical characterization, with the assistance of linguists and anthropologists
+(for a list of people who contributed expertise, see <a href="https://gelato.clld.org/about">Credits</a>).
+Languages introduced during colonial ages (widely diffused trans-national languages) are not considered,
+to exclude the wave of historical language shift documented in the past ~2 centuries.
+</p>
+<p>
+The GlottoCode link returns the linguistic classification of the genetic population samples.
+</p>
+<p>
+Geographic location of the populations is based on information on the genetic samples, and not on linguistic
+information. Migrants are located in their place of origin before the migration, when this information is
+available: details for migrant populations are indicated in the curation notes.
+</p>
+<p>
+Multilingualism is a common feature of human populations. In cases of multilingualism, we consider only
+one langauge as the main ("non-colonial") language present in the population. In some cases, suggestions
+for alternative language assignation are indicated in the curation notes.
+</p>
+
+
+<h3>Genetic statistics provided:</h3>
+<p>
+Methods from population genetics are used to calculate values of diversity within and between populations.
+The genetic summary statistics provided correspond to measures of relatedness and are shaped by the interaction
+of the ancestors of the individuals who contributed their genetic profile. The summary statistics associated to
+each population are suitable for population history investigation, and are not intended for any medical or commercial purposes.
+</p>
+<p>
+Further information on the population genetics methods employed is available in <a href="${req.route_url('parameters')}">measures</a>.
+</p>
+
+<h3>GeLaTo goals:</h3>
 <ul>
     <li>Allowing geneticists to properly characterize the human history behind the molecular data, and give an accessible reference dataset for regional or worldwide comparisons.</li>
     <li>Allowing linguists, historians and cultural anthropologists to integrate information on genealogical relatedness and demography, which can be robustly extrapolated from the genetic data.</li>

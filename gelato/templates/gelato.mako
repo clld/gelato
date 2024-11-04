@@ -10,13 +10,19 @@
 
 <%block name="footer">
     <div class="row-fluid" style="padding-top: 15px; border-top: 1px solid black;">
-        <div class="span3">
+        <div class="span2">
             <a href="http://www.comparativelinguistics.uzh.ch"
                title="Department of Comparative Linguistics - University of Zurich">
                 <img width="220" src="${request.static_url('gelato:static/UZH_logo.jpg')}" />
             </a>
         </div>
-        <div class="span6" style="text-align: center;">
+        <div class="span2">
+            <a href="https://evolvinglanguage.ch/"
+               title="evolving language - National Centre of Competence in Research">
+                <img width="200" src="${request.static_url('gelato:static/EvoLang.png')}" />
+            </a>
+        </div>
+        <div class="span4" style="text-align: center;">
             <% license_icon = h.format_license_icon_url(request) %>
             % if license_icon:
             <a rel="license" href="${request.dataset.license}">
@@ -37,19 +43,8 @@
                 ${request.dataset.jsondata.get('license_name', request.dataset.license)}
             </a>.
         </div>
-        ##<div class="span3" style="text-align: right;">
-        ##    <a href="${request.route_url('legal')}">disclaimer</a>
-        ##    <br/>
-        ##    % if request.registry.settings.get('clld.github_repos'):
-        ##    <a href="https://github.com/${request.registry.settings['clld.github_repos']}">
-        ##        <i class="icon-share">&nbsp;</i>
-        ##        Application source on<br/>
-        ##        <img height="25" src="${request.static_url('clld:web/static/images/GitHub_Logo.png')}" />
-        ##    </a>
-        ##    % endif
-        ##</div>
-        <div class="span3" style="text-align: right">
-            <a href="${request.dataset.publisher_url}"
+        <div class="span4" style="text-align: right">
+            <a href="https://www.eva.mpg.de/linguistic-and-cultural-evolution/index/"
                title="${request.dataset.publisher_name}, ${request.dataset.publisher_place}">
                 % if request.registry.settings.get('clld.publisher_logo'):
                     <img width="80" src="${request.static_url(request.registry.settings['clld.publisher_logo'])}" />
