@@ -70,7 +70,7 @@ Further information on the population genetics methods employed is available in 
 <h3>How to cite</h3>
 <p>If you use this data, please cite</p>
 <blockquote>
-    ${req.dataset.jsondata['citation']}
+    Barbieri et al. 2022. A global analysis of matches and mismatches between human genetic and linguistic histories. PNAS. DOI: 10.1073/pnas.2122084119
 </blockquote>
 <p>as well as the ${h.external_link('https://github.com/gelato-org/gelato-data/releases', label=_('released version'))} of the dataset.</p>
 <p>

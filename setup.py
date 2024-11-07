@@ -43,7 +43,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    test_suite="gelato",
     entry_points="""\
 [paste.app_factory]
 main = gelato:main

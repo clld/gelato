@@ -36,11 +36,11 @@ msgstr "Genetic samples"
 
 #: gelato/__init__.py:15
 msgid "Parameter"
-msgstr "Measure"
+msgstr ""
 
 #: gelato/__init__.py:16
 msgid "Parameters"
-msgstr "Measures"
+msgstr ""
 
 #: gelato/__init__.py:17
 msgid "Value"
