@@ -58,7 +58,7 @@ of the ancestors of the individuals who contributed their genetic profile. The s
 each population are suitable for population history investigation, and are not intended for any medical or commercial purposes.
 </p>
 <p>
-Further information on the population genetics methods employed is available in <a href="${req.route_url('parameters')}">measures</a>.
+Further information on the population genetics methods employed is available in <a href="${req.route_url('parameters')}">parameters</a>.
 </p>
 
 <h3>GeLaTo goals:</h3>
