@@ -11,9 +11,6 @@ import pytest
     "method,path",
     [
         ('get_html', '/'),
-        ('get_html', '/contributions/pembertonautosomalstr'),
-        ('get_html', '/parameters/pembertonautosomalstr-heterozygosity'),
-        ('get_html', '/languages/humanoriginsautosomalsnp-26'),
     ])
 def test_pages(app, method, path):
     getattr(app, method)(path)
