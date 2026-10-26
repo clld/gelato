@@ -3,7 +3,7 @@ babel==2.18.0
 beautifulsoup4==4.15.0
 bibtexparser==2.0.1
 bs4==0.0.2
-certifi==2026.7.22
+certifi==2026.10.19
 charset-normalizer==3.5.1
 cldfbench==2.0.1
 -e git+https://github.com/gelato-org/gelato-data@aa9b5debda3f7f9b94588b9f4445aab805859056#egg=cldfbench_gelato
