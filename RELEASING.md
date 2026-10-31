@@ -2,6 +2,7 @@
 
 Clone and install the app:
 ```shell
+git clone --branch v1.0.1 --depth 1 https://github.com/gelato-org/gelato-data
 git clone https://github.com/clld/gelato
 cd gelato
 pip install -e .[test]
@@ -20,6 +21,6 @@ pip freeze > requirements.txt
 
 Store a db dump:
 ```shell
-pg_dump -xO gelato > gelato.sql
+pg_dump -xO --compress gzip:9 gelato > gelato.sql.gz
 ```
 
